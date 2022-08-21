@@ -1,13 +1,13 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Counters } from './Counters';
-import { proxy } from 'valtio';
+import { proxy, useSnapshot } from 'valtio';
 
-export const store = proxy({
+const store = proxy({
   countSSR: 0,
 });
 
-export const ReactHook = {
+const ReactHook = {
   mounted() {
     const container = document.getElementById('b5');
     if (!container) return;
@@ -28,3 +28,5 @@ export const ReactHook = {
     });
   },
 };
+
+export { store, useSnapshot, React, ReactHook };

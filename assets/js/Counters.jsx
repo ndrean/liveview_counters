@@ -1,6 +1,4 @@
-import React from 'react';
-import { useSnapshot } from 'valtio';
-import { store } from './hookReact';
+import { store, useSnapshot, React } from './hookReact';
 
 export const Counters = ({ push, ssr, inc }) => {
   const [value, setValue] = React.useState(0);
