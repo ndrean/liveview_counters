@@ -76,7 +76,7 @@ defmodule LiveviewCountersWeb.HomeLive do
             case LiveviewCounters.FetchData.async(1) do
               {:ok, data} ->
                 socket = update(socket, :prefetching, &(!&1))
-                {:noreply, socket |> assign(:data, data)}
+                {:noreply, socket |> assign(:data, {:data, data})}
 
               {:error, reason} ->
                 socket = update(socket, :prefetching, &(!&1))
