@@ -30,8 +30,11 @@ config :swoosh, :api_client, false
 config :esbuild,
   version: "0.14.29",
   default: [
-    args:
-      ~w(js/app.jsx --bundle --target=es2020 --outdir=../priv/static/assets --external:/fonts/* --external:/images/* --loader:.js=jsx),
+    args: ~w(js/app.js js/Counters.jsx js/hookReact.jsx
+      --bundle --target=es2020 --format=esm --sourcemap --minify
+      --chunk-names=chunks/[name]-[hash] --splitting
+      --outdir=../priv/static/assets --external:/fonts/*
+      --external:/images/* --loader:.js=jsx),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]

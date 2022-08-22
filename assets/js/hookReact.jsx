@@ -1,6 +1,5 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Counters } from './Counters';
 import { proxy, useSnapshot } from 'valtio';
 
 const store = proxy({
@@ -12,16 +11,18 @@ const ReactHook = {
     const container = document.getElementById('b5');
     if (!container) return;
 
-    inc5 = Number(container.dataset.inc5);
-    inc6 = Number(container.dataset.inc6);
+    const inc5 = Number(container.dataset.inc5);
+    const inc6 = Number(container.dataset.inc6);
 
-    createRoot(container).render(
-      <Counters
-        push={c => this.push(c)}
-        ssr={() => this.ssr()}
-        inc={inc5}
-        incSSR={inc6}
-      />
+    import('./Counters.jsx').then(({ Counters }) =>
+      createRoot(container).render(
+        <Counters
+          push={c => this.push(c)}
+          ssr={() => this.ssr()}
+          inc={inc5}
+          incSSR={inc6}
+        />
+      )
     );
   },
   push(inc5) {
