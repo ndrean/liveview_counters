@@ -54,6 +54,8 @@ defmodule LiveviewCounters.MixProject do
       {:httpoison, "~> 1.8"},
       {:poison, "~> 5.0"},
       {:wait_for_it, "~> 1.3"},
+      # <- test Json
+      {:json, "~> 1.4"},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]

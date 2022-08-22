@@ -41,15 +41,16 @@ defmodule LiveviewCountersWeb.HomeLive do
     <HoverComp.display inc7={1_000_000}/>
 
     <h1>Counter: <%= @count %></h1>
-    <h3><%= inspect(@clicks)%></h3>
-    <h3><%= inspect(@display_data) %></h3>
+    <h3><%= Jason.encode!(@clicks) %></h3>
+    <h3><%= if @display_data != nil, do: Jason.encode!(elem(@display_data,1)) %></h3>
     """
   end
 
-  # <span id="b10" phx-hook="Hover"
-  #     style="border: 0.1rem solid; padding: 1rem 3.15rem; cursor: pointer; border-radius: 0.4rem;display: inline-block;"
-  #     phx-click={JS.push("inc7", value: %{inc7: 1_000_000})}
-  # > Add +1_000_000! </span>
+  defp update_socket(socket, key, inc) do
+    socket
+    |> update(:count, &(&1 + inc))
+    |> update(:clicks, &Map.put(&1, key, &1[key] + 1))
+  end
 
   @impl true
   def handle_event("prefetch", _, socket) do
@@ -92,82 +93,51 @@ defmodule LiveviewCountersWeb.HomeLive do
 
   @impl true
   def handle_event("inc1", %{"inc1" => inc1}, socket) do
-    socket =
-      socket
-      |> update(:count, &(&1 + String.to_integer(inc1)))
-      |> update(:clicks, &Map.put(&1, :b1, &1.b1 + 1))
+    socket = update_socket(socket, :b1, String.to_integer(inc1))
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("inc2", %{"inc2" => inc2}, socket) do
-    inc2 = String.to_integer(inc2)
-
-    socket =
-      socket
-      |> update(:count, &(&1 + inc2))
-      |> update(:clicks, &Map.put(&1, :b2, &1.b2 + 1))
+    socket = update_socket(socket, :b2, String.to_integer(inc2))
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("inc4", %{"inc4" => inc4}, socket) do
-    socket =
-      socket
-      |> update(:count, &(&1 + inc4))
-      |> update(:clicks, &Map.put(&1, :b4, &1.b4 + 1))
+    socket = update_socket(socket, :b4, inc4)
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("inc5", %{"inc5" => inc5}, socket) do
-    socket =
-      socket
-      |> update(:count, &(&1 + inc5))
-      |> update(:clicks, &Map.put(&1, :b5, &1.b5 + 1))
+    socket = update_socket(socket, :b5, inc5)
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("ssr", %{"inc6" => inc6}, socket) do
-    IO.inspect(inc6)
-    # inc6 = String.to_integer(inc6)
     socket =
-      socket
-      |> update(:count6, &(&1 + 1))
+      update_socket(socket, :b6, inc6)
       |> update(:count, &(&1 + inc6))
-      |> update(:clicks, &Map.put(&1, :b6, &1.b6 + 1))
 
-    IO.inspect(socket.assigns)
-    # new_count = socket.assigns.count + inc6
-    # socket (socket, count: new_count)
-    # {:noreply, push_event(socket, "incSSR", %{newCount: new_count})}
     {:reply, %{newCount: socket.assigns.count6}, socket}
   end
 
   @impl true
   def handle_event("inc7", %{"inc7" => inc7}, socket) do
-    socket =
-      socket
-      |> update(:count, &(&1 + inc7))
-      |> update(:clicks, &Map.put(&1, :b7, &1.b7 + 1))
-      |> assign(display_data: socket.assigns.data)
+    socket = update_socket(socket, :b7, inc7)
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_info(%{inc3: inc3}, socket) do
-    inc3 = String.to_integer(inc3)
-
-    socket =
-      socket
-      |> update(:count, &(&1 + inc3))
-      |> update(:clicks, &Map.put(&1, :b3, &1.b3 + 1))
+    socket = update_socket(socket, :b3, String.to_integer(inc3))
 
     {:noreply, socket}
   end
