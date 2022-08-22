@@ -8,8 +8,7 @@ config :liveview_counters, LiveviewCountersWeb.Endpoint,
   server: false
 
 # In test we don't send emails.
-config :liveview_counters, LiveviewCounters.Mailer,
-  adapter: Swoosh.Adapters.Test
+config :liveview_counters, LiveviewCounters.Mailer, adapter: Swoosh.Adapters.Test
 
 # Print only warnings and errors during test
 config :logger, level: :warn

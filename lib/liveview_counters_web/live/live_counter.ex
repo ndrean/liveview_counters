@@ -5,7 +5,6 @@ defmodule LiveButton do
   def render(assigns) do
     ~H"""
     <button id="b3" phx-click="inc3" phx-target={@myself} phx-value-inc3={@inc3}>Live Button +<%= @inc3%>, clicked: <%= @int%></button>
-
     """
   end
 

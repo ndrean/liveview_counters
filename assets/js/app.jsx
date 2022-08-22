@@ -24,16 +24,19 @@ import 'phoenix_html';
 // Establish Phoenix Socket and LiveView configuration.
 import { Socket } from 'phoenix';
 import { LiveSocket } from 'phoenix_live_view';
+import './user_socket.js';
+
 import topbar from '../vendor/topbar';
 import { ButtonHook } from './hookButton';
 import { ReactHook } from './hookReact';
+import { Hover } from './hover';
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute('content');
 let liveSocket = new LiveSocket('/live', Socket, {
   params: { _csrf_token: csrfToken },
-  hooks: { ReactHook, ButtonHook },
+  hooks: { ReactHook, ButtonHook, Hover },
 });
 
 // Show progress bar on live navigation and form submits

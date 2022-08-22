@@ -51,6 +51,9 @@ defmodule LiveviewCounters.MixProject do
       {:gettext, "~> 0.18"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
+      {:httpoison, "~> 1.8"},
+      {:poison, "~> 5.0"},
+      {:wait_for_it, "~> 1.3"},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]
