@@ -7,11 +7,13 @@ defmodule LiveviewCounters.Application do
 
   @impl true
   def start(_type, _args) do
+    :counters = :ets.new(:counters, [:set, :named_table, :public])
+
     children = [
       # Start the Telemetry supervisor
       LiveviewCountersWeb.Telemetry,
       # Start the PubSub system
-      {Phoenix.PubSub, name: LiveviewCounters.PubSub},
+      {Phoenix.PubSub, name: LiveviewCountersWeb.PubSub, adapter: Phoenix.PubSub.PG2},
       # Start the Endpoint (http/https)
       LiveviewCountersWeb.Endpoint
       # Start a worker by calling: LiveviewCounters.Worker.start_link(arg)

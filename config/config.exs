@@ -11,7 +11,7 @@ import Config
 config :liveview_counters, LiveviewCountersWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [view: LiveviewCountersWeb.ErrorView, accepts: ~w(html json), layout: false],
-  pubsub_server: LiveviewCounters.PubSub,
+  pubsub_server: LiveviewCountersWeb.PubSub,
   live_view: [signing_salt: "v73btUtC"]
 
 # Configures the mailer

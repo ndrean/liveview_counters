@@ -13,9 +13,15 @@ const ReactHook = {
     if (!container) return;
 
     inc5 = Number(container.dataset.inc5);
+    inc6 = Number(container.dataset.inc6);
 
     createRoot(container).render(
-      <Counters push={c => this.push(c)} ssr={() => this.ssr()} inc={inc5} />
+      <Counters
+        push={c => this.push(c)}
+        ssr={() => this.ssr()}
+        inc={inc5}
+        incSSR={inc6}
+      />
     );
   },
   push(inc5) {
@@ -23,7 +29,7 @@ const ReactHook = {
   },
   // with callback from LiveView
   ssr() {
-    this.pushEvent('ssr', {}, ({ newCount }) => {
+    this.pushEvent('ssr', { inc6 }, ({ newCount }) => {
       store.countSSR = newCount;
     });
   },
