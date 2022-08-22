@@ -9,7 +9,7 @@ defmodule LiveviewCountersWeb.HomeLive do
 
   @impl true
   def mount(_, _, socket) do
-    if connected?(socket), do: IO.inspect(socket, label: "parent")
+    if connected?(socket), do: Logger.debug(socket, label: "parent")
     # Phoenix.PubSub.subscribe(LiveviewCountersWeb.PubSub, @topic)
     # LiveviewCountersWeb.Endpoint.subscribe(@topic)
 
@@ -130,7 +130,9 @@ defmodule LiveviewCountersWeb.HomeLive do
 
   @impl true
   def handle_event("inc7", %{"inc7" => inc7}, socket) do
-    socket = update_socket(socket, :b7, inc7)
+    socket =
+      update_socket(socket, :b7, inc7)
+      |> assign(:display_data, socket.assigns.data)
 
     {:noreply, socket}
   end

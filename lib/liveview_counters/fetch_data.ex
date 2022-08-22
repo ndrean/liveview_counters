@@ -6,7 +6,6 @@ defmodule LiveviewCounters.FetchData do
   def async(i) do
     task =
       Task.async(fn ->
-        # Process.sleep(3000)
         HTTPoison.get(get_page(i))
       end)
 
