@@ -1,6 +1,6 @@
 defmodule LiveviewCountersWeb.HomeLive do
   use Phoenix.LiveView
-  alias Phoenix.LiveView.JS
+  # alias Phoenix.LiveView.JS
   require WaitForIt
   require Logger
 
