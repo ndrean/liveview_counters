@@ -123,7 +123,7 @@ defmodule LiveviewCountersWeb.HomeLive do
   def handle_event("ssr", %{"inc6" => inc6}, socket) do
     socket =
       update_socket(socket, :b6, inc6)
-      |> update(:count, &(&1 + inc6))
+      |> update(:count6, &(&1 + 1))
 
     {:reply, %{newCount: socket.assigns.count6}, socket}
   end

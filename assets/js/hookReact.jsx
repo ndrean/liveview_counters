@@ -18,7 +18,7 @@ const ReactHook = {
       createRoot(container).render(
         <Counters
           push={c => this.push(c)}
-          ssr={() => this.ssr()}
+          ssr={c => this.ssr(c)}
           inc={inc5}
           incSSR={inc6}
         />
@@ -29,8 +29,9 @@ const ReactHook = {
     this.pushEvent('inc5', { inc5 });
   },
   // with callback from LiveView
-  ssr() {
+  ssr(inc6) {
     this.pushEvent('ssr', { inc6 }, ({ newCount }) => {
+      console.log({ newCount });
       store.countSSR = newCount;
     });
   },

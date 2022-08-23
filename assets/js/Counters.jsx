@@ -15,7 +15,7 @@ export const Counters = ({ push, ssr, inc, incSSR }) => {
         Stateful React: +{inc}, <span>Clicked: {value}</span>
       </button>
       <br />
-      <button onClick={ssr}>
+      <button onClick={() => ssr(incSSR)}>
         Stateless React: +{incSSR}, Clicked: {countSSR}
       </button>
     </>
