@@ -9,7 +9,7 @@ defmodule LiveviewCountersWeb.HomeLive do
 
   @impl true
   def mount(_, _, socket) do
-    if connected?(socket), do: Logger.debug(socket, label: "parent")
+    if connected?(socket), do: Phoenix.PubSub.subscribe(LiveviewCounters.PubSub, "counter")
     # Phoenix.PubSub.subscribe(LiveviewCountersWeb.PubSub, @topic)
     # LiveviewCountersWeb.Endpoint.subscribe(@topic)
 
@@ -49,9 +49,14 @@ defmodule LiveviewCountersWeb.HomeLive do
   end
 
   defp update_socket(socket, key, inc) do
+    socket =
+      socket
+      |> update(:count, &(&1 + inc))
+      |> update(:clicks, &Map.put(&1, key, &1[key] + 1))
+
+    message = %{clicks: socket.assigns.clicks, count: socket.assigns.count}
+    Phoenix.PubSub.broadcast(LiveviewCounters.PubSub, "counter", message)
     socket
-    |> update(:count, &(&1 + inc))
-    |> update(:clicks, &Map.put(&1, key, &1[key] + 1))
   end
 
   @impl true
@@ -161,7 +166,11 @@ defmodule LiveviewCountersWeb.HomeLive do
   @impl true
   def handle_info(%{inc3: inc3}, socket) do
     socket = update_socket(socket, :b3, String.to_integer(inc3))
+    {:noreply, socket}
+  end
 
+  def handle_info(%{clicks: clicks, count: count} = _message, socket) do
+    IO.inspect(clicks, label: "info")
     {:noreply, socket}
   end
 end

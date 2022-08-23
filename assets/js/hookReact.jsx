@@ -42,11 +42,7 @@ const ReactHook = {
     this.pushEvent(
       'ssr',
       { inc6 },
-
-      ({ newCount }) => {
-        console.log({ newCount });
-        store.countSSR = newCount;
-      }
+      ({ newCount }) => (store.countSSR = newCount)
     );
   },
 };

@@ -1,5 +1,6 @@
 defmodule LiveviewCountersWeb.CounterChannel do
   use LiveviewCountersWeb, :channel
+  require Logger
 
   @impl true
   def join("counter:lobby", payload, socket) do
@@ -26,7 +27,12 @@ defmodule LiveviewCountersWeb.CounterChannel do
   end
 
   # Add authorization logic here as required.
-  defp authorized?(_payload) do
+  defp authorized?(payload) when payload != nil do
+    Logger.debug(payload)
     true
+  end
+
+  defp authorized?(_payload) do
+    false
   end
 end
