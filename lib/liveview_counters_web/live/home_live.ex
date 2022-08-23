@@ -40,6 +40,8 @@ defmodule LiveviewCountersWeb.HomeLive do
 
     <HoverComp.display inc7={1_000_000}/>
 
+    <button phx-hook="Notify" id="b11" phx-click="notify">Notify?</button>
+
     <h1>Counter: <%= @count %></h1>
     <h3><%= Jason.encode!(@clicks) %></h3>
     <h3><%= if @display_data != nil, do: Jason.encode!(elem(@display_data,1)) %></h3>
@@ -50,6 +52,11 @@ defmodule LiveviewCountersWeb.HomeLive do
     socket
     |> update(:count, &(&1 + inc))
     |> update(:clicks, &Map.put(&1, key, &1[key] + 1))
+  end
+
+  @impl true
+  def handle_event("notify", _, socket) do
+    {:noreply, push_event(socket, "notif", %{})}
   end
 
   @impl true
@@ -119,6 +126,7 @@ defmodule LiveviewCountersWeb.HomeLive do
     {:noreply, socket}
   end
 
+  # callback from client pushEvent
   @impl true
   def handle_event("ssr", %{"inc6" => inc6}, socket) do
     socket =
@@ -128,13 +136,26 @@ defmodule LiveviewCountersWeb.HomeLive do
     {:reply, %{newCount: socket.assigns.count6}, socket}
   end
 
+  # alternative to above: client has callback handleEvent
   @impl true
+  def handle_event("ssr2", %{"inc6" => inc6}, socket) do
+    IO.puts("ssr2")
+
+    socket =
+      update_socket(socket, :b6, inc6)
+      |> update(:count6, &(&1 + 1))
+
+    {:noreply, push_event(socket, "server", %{newCount: socket.assigns.count6})}
+  end
+
+  @impl true
+  # click to fetch data from fake button and send notification BTW
   def handle_event("inc7", %{"inc7" => inc7}, socket) do
     socket =
       update_socket(socket, :b7, inc7)
       |> assign(:display_data, socket.assigns.data)
 
-    {:noreply, socket}
+    {:noreply, push_event(socket, "notif", %{msg: "data here!"})}
   end
 
   @impl true
