@@ -12,12 +12,8 @@ const ReactHook = {
     const inc5 = Number(container.dataset.inc5);
     const inc6 = Number(container.dataset.inc6);
 
-    /*
-    this.handleEvent('server', ({ newCount }) => {
-      console.log({ newCount });
-      store.countSSR = newCount;
-    });
-    */
+    // update counter SSR
+    this.handleEvent('server', ({ newCount }) => (store.countSSR = newCount));
 
     subscribe(store, () => {
       console.log('Store updated!: ', store.countSSR);
@@ -37,13 +33,15 @@ const ReactHook = {
   push(inc5) {
     this.pushEvent('inc5', { inc5 });
   },
-  // ssr : with callback from LiveView, ssr2, with handleEvent above
+  // ssr : with callback or not
   ssr(inc6) {
-    this.pushEvent(
-      'ssr',
-      { inc6 },
-      ({ newCount }) => (store.countSSR = newCount)
-    );
+    this.pushEvent('ssr', { inc6 });
+    /*
+    , ({ newCount }) => {
+      console.log('ssr: ', { newCount });
+      return (store.countSSR = newCount);
+    });
+    */
   },
 };
 

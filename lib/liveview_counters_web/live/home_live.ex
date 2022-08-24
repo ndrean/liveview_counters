@@ -1,17 +1,15 @@
 defmodule LiveviewCountersWeb.HomeLive do
   use Phoenix.LiveView
-  # alias Phoenix.LiveView.JS
   require WaitForIt
   require Logger
 
-  # @topic "counters"
+  @topic "counters"
   # @topic inspect(__MODULE__)
 
   @impl true
-  def mount(_, _, socket) do
-    if connected?(socket), do: Phoenix.PubSub.subscribe(LiveviewCounters.PubSub, "counter")
-    # Phoenix.PubSub.subscribe(LiveviewCountersWeb.PubSub, @topic)
-    # LiveviewCountersWeb.Endpoint.subscribe(@topic)
+  def mount(_params, _session, socket) do
+    if connected?(socket), do: LiveviewCountersWeb.Endpoint.subscribe(@topic)
+    # Phoenix.PubSub.subscribe(LiveviewCounters.PubSub, "counter")
 
     {:ok,
      assign(socket,
@@ -20,7 +18,8 @@ defmodule LiveviewCountersWeb.HomeLive do
        count6: 0,
        clicks: %{b1: 0, b2: 0, b3: 0, b4: 0, b5: 0, b6: 0, b7: 0},
        data: nil,
-       display_data: nil
+       display_data: nil,
+       int: 0
      )}
   end
 
@@ -32,7 +31,7 @@ defmodule LiveviewCountersWeb.HomeLive do
 
     <SimpleCounter.display inc2={10} />
 
-    <.live_component module={LiveButton} id="b3" inc3={100} int={0}/>
+    <.live_component module={LiveButton} id="b3" inc3={100} int={@int}/>
 
     <HookButton.display inc4={1000}/>
 
@@ -48,14 +47,16 @@ defmodule LiveviewCountersWeb.HomeLive do
     """
   end
 
-  defp update_socket(socket, key, inc) do
+  defp update_socket(socket, key, inc, event) do
     socket =
       socket
       |> update(:count, &(&1 + inc))
       |> update(:clicks, &Map.put(&1, key, &1[key] + 1))
 
-    message = %{clicks: socket.assigns.clicks, count: socket.assigns.count}
-    Phoenix.PubSub.broadcast(LiveviewCounters.PubSub, "counter", message)
+    # message = %{clicks: socket.assigns.clicks, count: socket.assigns.count}
+    # message = sockets.assigns
+    # Phoenix.PubSub.broadcast(LiveviewCounters.PubSub, "counter", message)
+    LiveviewCountersWeb.Endpoint.broadcast!(@topic, event, %{message: socket.assigns})
     socket
   end
 
@@ -105,50 +106,58 @@ defmodule LiveviewCountersWeb.HomeLive do
 
   @impl true
   def handle_event("inc1", %{"inc1" => inc1}, socket) do
-    socket = update_socket(socket, :b1, String.to_integer(inc1))
+    socket = update_socket(socket, :b1, String.to_integer(inc1), "inc1")
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("inc2", %{"inc2" => inc2}, socket) do
-    socket = update_socket(socket, :b2, String.to_integer(inc2))
+    socket = update_socket(socket, :b2, String.to_integer(inc2), "inc2")
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("inc4", %{"inc4" => inc4}, socket) do
-    socket = update_socket(socket, :b4, inc4)
+    socket = update_socket(socket, :b4, inc4, "inc4")
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("inc5", %{"inc5" => inc5}, socket) do
-    socket = update_socket(socket, :b5, inc5)
+    socket = update_socket(socket, :b5, inc5, "inc5")
 
     {:noreply, socket}
   end
 
-  # callback from client pushEvent
-  @impl true
-  def handle_event("ssr", %{"inc6" => inc6}, socket) do
-    socket =
-      update_socket(socket, :b6, inc6)
-      |> update(:count6, &(&1 + 1))
+  # callback from client pushEvent.... does not work when broadcast ???
+  # @impl true
+  # def handle_event("ssr", %{"inc6" => inc6}, socket) do
+  #   socket =
+  #     socket
+  #     # update_socket(socket, :b6, inc6, "inc6")
+  #     |> update(:count, &(&1 + inc6))
+  #     |> update(:clicks, &Map.put(&1, :b6, &1[:b6] + 1))
+  #     |> update(:count6, &(&1 + 1))
 
-    {:reply, %{newCount: socket.assigns.count6}, socket}
-  end
+  #   LiveviewCountersWeb.Endpoint.broadcast!(@topic, "inc6", %{message: socket.assigns})
+  #   IO.inspect(socket.assigns.count6)
+  #   {:reply, %{newCount: socket.assigns.count6}, socket}
+  # end
 
   # alternative to above: client has callback handleEvent
   @impl true
-  def handle_event("ssr2", %{"inc6" => inc6}, socket) do
-    IO.puts("ssr2")
-
+  def handle_event("ssr", %{"inc6" => inc6}, socket) do
     socket =
-      update_socket(socket, :b6, inc6)
+      socket
+      # update_socket(socket, :b6, inc6, "inc6")
+      |> update(:count, &(&1 + inc6))
+      |> update(:clicks, &Map.put(&1, :b6, &1[:b6] + 1))
       |> update(:count6, &(&1 + 1))
+
+    LiveviewCountersWeb.Endpoint.broadcast!(@topic, "inc6", %{message: socket.assigns})
 
     {:noreply, push_event(socket, "server", %{newCount: socket.assigns.count6})}
   end
@@ -157,20 +166,51 @@ defmodule LiveviewCountersWeb.HomeLive do
   # click to fetch data from fake button and send notification BTW
   def handle_event("inc7", %{"inc7" => inc7}, socket) do
     socket =
-      update_socket(socket, :b7, inc7)
+      socket
+      # update_socket(socket, :b7, inc7, "inc7")
+      |> update(:count, &(&1 + inc7))
+      |> update(:clicks, &Map.put(&1, :b7, &1[:b7] + 1))
       |> assign(:display_data, socket.assigns.data)
+
+    LiveviewCountersWeb.Endpoint.broadcast!(@topic, "inc7", %{message: socket.assigns})
 
     {:noreply, push_event(socket, "notif", %{msg: "data here!"})}
   end
 
   @impl true
-  def handle_info(%{inc3: inc3}, socket) do
-    socket = update_socket(socket, :b3, String.to_integer(inc3))
-    {:noreply, socket}
+  #
+  def handle_info(%{inc3: inc3, int: int}, socket) do
+    socket =
+      socket
+      # update_socket(socket, :b7, inc7, "inc7")
+      |> update(:count, &(&1 + String.to_integer(inc3)))
+      |> update(:clicks, &Map.put(&1, :b3, &1[:b3] + 1))
+      |> assign(int: int)
+
+    LiveviewCountersWeb.Endpoint.broadcast!(@topic, "inc3", %{message: socket.assigns})
+    {:noreply, push_event(socket, "test", %{info: "test"})}
   end
 
-  def handle_info(%{clicks: clicks, count: count} = _message, socket) do
-    IO.inspect(clicks, label: "info")
-    {:noreply, socket}
+  # @impl true
+  # push_event to update the live_button counter
+  def handle_info(
+        %Phoenix.Socket.Broadcast{event: _event, payload: %{message: message}, topic: @topic},
+        socket
+      ) do
+    {:noreply,
+     push_event(
+       socket
+       |> assign(
+         count: message.count,
+         clicks: message.clicks,
+         count6: message.count6,
+         data: message.data,
+         display_data: message.display_data,
+         prefetching: message.prefetching,
+         int: message.int
+       ),
+       "server",
+       %{newCount: message.count6}
+     )}
   end
 end

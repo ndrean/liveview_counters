@@ -1,5 +1,5 @@
 function sendNotification(msg, user) {
-  const notification = new Notification('New message from Open Chat', {
+  const notification = new Notification('New message:', {
     icon: 'https://cdn-icons-png.flaticon.com/512/733/733585.png',
     body: `@${user}: ${msg}`,
   });
@@ -16,7 +16,9 @@ export const Notify = {
   mounted() {
     // don't ask user for notification permission on mount but only if one pushes this first notification
     this.handleEvent('notif', ({ msg }) => {
-      if (!('Notification' in window)) return;
+      if (!('Notification' in window)) {
+        return showError();
+      }
 
       (async () => {
         await Notification.requestPermission(permission => {
