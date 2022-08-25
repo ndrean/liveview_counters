@@ -9,3 +9,7 @@ See explanations [dev.to](https://dev.to/ndrean/notes-on-liveview-components-and
 ## Branch notification
 
 Sends Notification API when data displayed
+
+new EyeDropper().open().then((result) => {
+    let chosenColor = result.sRGBHex;
+})

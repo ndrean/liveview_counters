@@ -27,7 +27,7 @@ defmodule LiveviewCountersWeb.HomeLive do
   @spec render(any) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
-    <button id="b1"  phx-click="inc1" phx-value-inc1={1}>Increment: +1</button>
+    <button id="b1"  phx-click="inc1" phx-value-inc1={1} type="button">Increment: +1 </button>
 
     <SimpleCounter.display inc2={10} />
 
@@ -41,9 +41,9 @@ defmodule LiveviewCountersWeb.HomeLive do
 
     <button phx-hook="Notify" id="b11" phx-click="notify">Notify?</button>
 
-    <h1>Counter: <%= @count %></h1>
-    <h3><%= Jason.encode!(@clicks) %></h3>
-    <h3><%= if @display_data != nil, do: Jason.encode!(elem(@display_data,1)) %></h3>
+    <h1 >Counter: <span id="counter"><%= @count %></span></h1>
+    <h3 id="clicks-map"><%= Jason.encode!(@clicks) %></h3>
+    <h3 id="displayed-data"><%= if @display_data != nil, do: Jason.encode!(elem(@display_data,1)) %></h3>
     """
   end
 
@@ -67,12 +67,12 @@ defmodule LiveviewCountersWeb.HomeLive do
 
   @impl true
   def handle_event("prefetch", _, socket) do
+    IO.inspect(socket.connect_info)
+
     case socket.assigns.prefetching do
       true ->
         case WaitForIt.wait(:ets.lookup(:counters, :data) != []) do
-          #  frequency: 1_000,
-          #  timeout: 2_000
-          # ) do
+          #  frequency: 1_000, timeout: 2_000
           {:ok, data} ->
             {:noreply, socket |> assign(:data, data)}
 
