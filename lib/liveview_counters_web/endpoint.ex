@@ -31,7 +31,15 @@ defmodule LiveviewCountersWeb.Endpoint do
   end
 
   socket "/socket", LiveviewCountersWeb.UserSocket,
-    websocket: true,
+    websocket: [
+      connect_info: [
+        :peer_data,
+        :trace_context_headers,
+        :x_headers,
+        :uri,
+        {:session, @session_options}
+      ]
+    ],
     longpoll: false
 
   plug Phoenix.LiveDashboard.RequestLogger,

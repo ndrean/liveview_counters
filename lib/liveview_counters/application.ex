@@ -13,7 +13,7 @@ defmodule LiveviewCounters.Application do
       # Start the Telemetry supervisor
       LiveviewCountersWeb.Telemetry,
       # Start the PubSub system
-      {Phoenix.PubSub, name: LiveviewCountersWeb.PubSub, adapter: Phoenix.PubSub.PG2},
+      {Phoenix.PubSub, name: LiveviewCounters.PubSub, adapter: Phoenix.PubSub.PG2},
       # Start the Endpoint (http/https)
       LiveviewCountersWeb.Endpoint
       # Start a worker by calling: LiveviewCounters.Worker.start_link(arg)
