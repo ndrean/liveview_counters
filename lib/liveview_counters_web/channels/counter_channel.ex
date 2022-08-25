@@ -2,12 +2,8 @@ defmodule LiveviewCountersWeb.CounterChannel do
   use LiveviewCountersWeb, :channel
 
   @impl true
-  def join("counter:lobby", payload, socket) do
-    if authorized?(payload) do
-      {:ok, socket}
-    else
-      {:error, %{reason: "unauthorized"}}
-    end
+  def join("counter:lobby", _payload, socket) do
+    {:ok, socket}
   end
 
   # Channels can be used in a request/response fashion
@@ -26,7 +22,7 @@ defmodule LiveviewCountersWeb.CounterChannel do
   end
 
   # Add authorization logic here as required.
-  defp authorized?(_payload) do
-    true
-  end
+  # defp authorized?(_payload) do
+  #   true
+  # end
 end

@@ -30,13 +30,14 @@ import topbar from '../vendor/topbar';
 import { ButtonHook } from './hookButton';
 import { ReactHook } from './hookReact';
 import { Hover } from './hover';
+import { MapHook } from './MapHook';
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute('content');
 let liveSocket = new LiveSocket('/live', Socket, {
   params: { _csrf_token: csrfToken },
-  hooks: { ReactHook, ButtonHook, Hover },
+  hooks: { ReactHook, ButtonHook, Hover, MapHook },
 });
 
 // Show progress bar on live navigation and form submits

@@ -14,8 +14,10 @@ const ReactHook = {
     const inc5 = Number(container.dataset.inc5);
     const inc6 = Number(container.dataset.inc6);
 
+    const root = createRoot(container);
+
     import('./Counters.jsx').then(({ Counters }) =>
-      createRoot(container).render(
+      root.render(
         <Counters
           push={c => this.push(c)}
           ssr={c => this.ssr(c)}

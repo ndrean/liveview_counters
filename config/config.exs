@@ -27,12 +27,16 @@ config :liveview_counters, LiveviewCounters.Mailer, adapter: Swoosh.Adapters.Loc
 config :swoosh, :api_client, false
 
 # Configure esbuild (the version is required)
+# --minify
+# --chunk-names=chunks/[name]-[hash] --splitting
+# --format=esm
 config :esbuild,
   version: "0.14.29",
   default: [
-    args: ~w(js/app.js js/Counters.jsx js/hookReact.jsx
-      --bundle --target=es2020 --format=esm --sourcemap --minify
-      --chunk-names=chunks/[name]-[hash] --splitting
+    args: ~w(js/app.js js/Counters.jsx js/hookReact.jsx js/Map.jsx
+      --bundle --target=es2020
+      --sourcemap
+      --loader:.png=dataurl
       --outdir=../priv/static/assets --external:/fonts/*
       --external:/images/* --loader:.js=jsx),
     cd: Path.expand("../assets", __DIR__),
