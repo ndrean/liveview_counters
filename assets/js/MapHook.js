@@ -1,16 +1,140 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+import { geocoder } from 'leaflet-control-geocoder';
+
+function getLocation(map) {
+  navigator.geolocation.getCurrentPosition(locationfound, locationdenied);
+  function locationfound({ coords: { latitude: lat, longitude: lng } }) {
+    map.flyTo([lat, lng], 15);
+    return true;
+  }
+  function locationdenied() {
+    window.alert('location access denied');
+    return null;
+  }
+}
+
+const place = { coords: [], distance: 0 };
 
 export const MapHook = {
   mounted() {
-    const container = document.getElementById('map');
-    const root = createRoot(container);
-    import('./Map.jsx').then(({ MapComponent }) =>
-      root.render(
-        <React.Suspense fallback={<h1>Loading...</h1>}>
-          <MapComponent />
-        </React.Suspense>
-      )
-    );
+    const map = L.map('map').setView([45, 0], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap',
+    }).addTo(map);
+
+    L.Control.geocoder().addTo(map);
+    const geoCoder = L.Control.Geocoder.nominatim();
+
+    console.log(getLocation(map));
+
+    const layerGroup = L.layerGroup().addTo(map);
+    const lineLayer = L.geoJSON();
+
+    function drawLine(lineLayer) {
+      const [start, end, ...rest] = place.coords;
+      if (start && end) {
+        const p1 = L.latLng([start.lat, start.lng]);
+        const p2 = L.latLng([end.lat, end.lng]);
+
+        lineLayer
+          .addData({
+            type: 'LineString',
+            coordinates: [
+              [start.lng, start.lat],
+              [end.lng, end.lat],
+            ],
+          })
+          .addTo(map);
+
+        place.distance = (p1.distanceTo(p2) / 1000).toFixed(2);
+      }
+    }
+
+    function openMarker(marker, id) {
+      document.querySelector('button.remove').addEventListener('click', () => {
+        const line = document.querySelector('.leaflet-interactive');
+        place.coords = place.coords.filter(c => c.id !== id) || [];
+        place.distance = 0;
+        layerGroup.removeLayer(marker);
+        if (line) line.remove();
+      });
+    }
+
+    function addButton(html) {
+      return `<h5>${html}</h5>
+              <button type="button" class="remove" >Remove</button>`;
+    }
+
+    function draggedMarker(mark, id, lineLayer) {
+      document.querySelector('.leaflet-interactive').remove();
+      layerGroup.removeLayer(mark);
+      const newLatLng = mark.getLatLng();
+      const marker = L.marker(newLatLng, { draggable: true });
+      marker.addTo(layerGroup).addTo(map);
+      const draggedPlace = place.coords.find(c => c.id === id);
+      draggedPlace.lat = newLatLng.lat;
+      draggedPlace.lng = newLatLng.lng;
+      drawLine(lineLayer);
+      discover(marker, newLatLng, id);
+      marker.on('popupopen', () => console.log(openMarker(marker, id)));
+      marker.on('dragend', () => draggedMarker(marker, id, lineLayer));
+    }
+
+    function discover(marker, location, id) {
+      // return new Promise((resolve, _) => {
+      // resolve(
+      geoCoder.reverse(location, 12, result => {
+        let { html } = result[0];
+        place.coords = place.coords.filter(c => c.id !== id);
+        place.coords.push({
+          html,
+          lat: location.lat,
+          lng: location.lng,
+          id,
+        });
+
+        html = addButton(html);
+        return marker.bindPopup(html);
+      });
+      // );
+      // });
+    }
+
+    map.on('click', e => {
+      geoCoder.reverse(e.latlng, 12, result => {
+        let { html } = result[0];
+        html = addButton(html);
+
+        const marker = L.marker(e.latlng, { draggable: true });
+        marker.addTo(layerGroup).addTo(map);
+        marker.bindPopup(html);
+
+        const location = {
+          id: marker._leaflet_id,
+          lat: e.latlng.lat,
+          lng: e.latlng.lng,
+          html,
+        };
+
+        if (place.coords.find(c => c.id === location.id) === undefined)
+          place.coords.push(location);
+
+        drawLine(lineLayer);
+        marker.on('popupopen', () => openMarker(marker, location.id));
+        marker.on('dragend', () =>
+          draggedMarker(marker, location.id, lineLayer)
+        );
+      });
+    });
   },
 };

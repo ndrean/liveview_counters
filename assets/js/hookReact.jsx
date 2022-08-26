@@ -1,10 +1,13 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { proxy, useSnapshot } from 'valtio';
+import { Spinner } from './Spinner';
 
 const store = proxy({
   countSSR: 0,
 });
+
+const LazyCounter = React.lazy(() => import('./Counters'));
 
 const ReactHook = {
   mounted() {
@@ -16,15 +19,16 @@ const ReactHook = {
 
     const root = createRoot(container);
 
-    import('./Counters.jsx').then(({ Counters }) =>
-      root.render(
-        <Counters
+    // import('./Counters.jsx').then(({ Counters }) =>
+    root.render(
+      <React.Suspense fallback={<Spinner />}>
+        <LazyCounter
           push={c => this.push(c)}
           ssr={c => this.ssr(c)}
           inc={inc5}
           incSSR={inc6}
         />
-      )
+      </React.Suspense>
     );
   },
   push(inc5) {

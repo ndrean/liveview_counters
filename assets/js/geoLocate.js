@@ -1,10 +1,12 @@
+/*
 import { proxy, useSnapshot } from 'valtio';
 import { derive } from 'valtio/utils';
 
 const gps = proxy({
-  initPos: { lat: 45, lng: 0 },
+  initPos: { lat: 45, lng: 50 },
   currentPos: { lat: null, lng: null },
 });
+
 
 derive({
   derPos: async get => {
@@ -19,5 +21,5 @@ derive({
     }
   },
 });
-
-export { gps, useSnapshot };
+*/
+// export { gps, useSnapshot };

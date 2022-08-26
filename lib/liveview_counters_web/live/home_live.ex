@@ -41,8 +41,8 @@ defmodule LiveviewCountersWeb.HomeLive do
     <HoverComp.display inc7={1_000_000}/>
 
     <h1>Counter: <%= @count %></h1>
-    <h3><%= Jason.encode!(@clicks) %></h3>
-    <h3><%= if @display_data != nil, do: Jason.encode!(elem(@display_data,1)) %></h3>
+    <h3><%# Jason.encode!(@clicks) %></h3>
+    <h3><%# if @display_data != nil, do: Jason.encode!(elem(@display_data,1)) %></h3>
 
     <hr/>
     <MyMap.display />

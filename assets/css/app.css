@@ -2,12 +2,42 @@
 @import './phoenix.css';
 @import 'leaflet/dist/leaflet.css';
 @import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+/* @import 'leaflet-geosearch/dist/geosearch.css'; */
+/* @import 'esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css'; */
 
+#map {
+  height: 400px;
+  width: 100%;
+}
 
+/* .leaflet-container {
+  height: 400px;
+  width: 100%;
+} */
 
-.leaflet-container {
-  height: 200px;
-  width: 100%
+.pos-center {
+  position: fixed;
+  top: calc(50% - 40px);
+  left: calc(50% - 40px);
+}
+
+.loader {
+  border: 10px solid #f3f3f3;
+  border-top: 10px solid #3498db;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Alerts and form errors used by phx.new */

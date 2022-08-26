@@ -30,13 +30,16 @@ config :swoosh, :api_client, false
 # --minify
 # --chunk-names=chunks/[name]-[hash] --splitting
 # --format=esm
+# js/Counters.jsx js/hookReact.jsx js/Map.jsx
 config :esbuild,
   version: "0.14.29",
   default: [
-    args: ~w(js/app.js js/Counters.jsx js/hookReact.jsx js/Map.jsx
+    args: ~w(
+      js/app.js
       --bundle --target=es2020
       --sourcemap
       --loader:.png=dataurl
+      --loader:.gif=dataurl
       --outdir=../priv/static/assets --external:/fonts/*
       --external:/images/* --loader:.js=jsx),
     cd: Path.expand("../assets", __DIR__),

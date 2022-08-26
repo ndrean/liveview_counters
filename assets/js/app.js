@@ -37,8 +37,10 @@ let csrfToken = document
   .getAttribute('content');
 let liveSocket = new LiveSocket('/live', Socket, {
   params: { _csrf_token: csrfToken },
-  hooks: { ReactHook, ButtonHook, Hover, MapHook },
+  hooks: { ButtonHook, Hover, MapHook, ReactHook },
 });
+
+// ReactHook,
 
 // Show progress bar on live navigation and form submits
 topbar.config({ barColors: { 0: '#29d' }, shadowColor: 'rgba(0, 0, 0, .3)' });

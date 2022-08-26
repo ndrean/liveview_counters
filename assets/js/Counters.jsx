@@ -1,6 +1,6 @@
 import { store, useSnapshot, React } from './hookReact';
 
-export const Counters = ({ push, ssr, inc, incSSR }) => {
+const Counters = ({ push, ssr, inc, incSSR }) => {
   const [value, setValue] = React.useState(0);
   const { countSSR } = useSnapshot(store);
 
@@ -21,3 +21,5 @@ export const Counters = ({ push, ssr, inc, incSSR }) => {
     </>
   );
 };
+
+export default Counters;

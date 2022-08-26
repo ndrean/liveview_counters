@@ -9,3 +9,5 @@ See explanations [dev.to](https://dev.to/ndrean/notes-on-liveview-components-and
 ## Esbuild
 
 [loader for png/dataUrl](https://esbuild.github.io/api/#loader)
+
+npm i leaflet-control-geocoder
