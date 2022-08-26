@@ -38,23 +38,22 @@ export const MapHook = {
     console.log(getLocation(map));
 
     const layerGroup = L.layerGroup().addTo(map);
-    const lineLayer = L.geoJSON();
+    const lineLayer = L.layerGroup().addTo(map);
 
-    function drawLine(lineLayer) {
+    function drawLine() {
       const [start, end, ...rest] = place.coords;
+      if (!start || !end) lineLayer.clearLayers();
       if (start && end) {
         const p1 = L.latLng([start.lat, start.lng]);
         const p2 = L.latLng([end.lat, end.lng]);
 
-        lineLayer
-          .addData({
-            type: 'LineString',
-            coordinates: [
-              [start.lng, start.lat],
-              [end.lng, end.lat],
-            ],
-          })
-          .addTo(map);
+        L.polyline(
+          [
+            [start.lat, start.lng],
+            [end.lat, end.lng],
+          ],
+          { color: 'red' }
+        ).addTo(lineLayer);
 
         place.distance = (p1.distanceTo(p2) / 1000).toFixed(2);
       }
@@ -62,11 +61,12 @@ export const MapHook = {
 
     function openMarker(marker, id) {
       document.querySelector('button.remove').addEventListener('click', () => {
-        const line = document.querySelector('.leaflet-interactive');
         place.coords = place.coords.filter(c => c.id !== id) || [];
         place.distance = 0;
         layerGroup.removeLayer(marker);
-        if (line) line.remove();
+        if (place.coords.findIndex(c => c.id === id) < 2)
+          lineLayer.clearLayers();
+        drawLine();
       });
     }
 
@@ -84,7 +84,7 @@ export const MapHook = {
       const draggedPlace = place.coords.find(c => c.id === id);
       draggedPlace.lat = newLatLng.lat;
       draggedPlace.lng = newLatLng.lng;
-      drawLine(lineLayer);
+      drawLine();
       discover(marker, newLatLng, id);
       marker.on('popupopen', () => console.log(openMarker(marker, id)));
       marker.on('dragend', () => draggedMarker(marker, id, lineLayer));
