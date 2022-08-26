@@ -32,13 +32,38 @@ export const MapHook = {
       attribution: '© OpenStreetMap',
     }).addTo(map);
 
-    L.Control.geocoder().addTo(map);
-    const geoCoder = L.Control.Geocoder.nominatim();
-
-    console.log(getLocation(map));
-
+    getLocation(map);
     const layerGroup = L.layerGroup().addTo(map);
     const lineLayer = L.layerGroup().addTo(map);
+    const geoCoder = L.Control.Geocoder.nominatim();
+
+    L.Control.geocoder({
+      defaultMarkGeocode: false,
+    })
+      .on('markgeocode', function ({ geocode: { center, html, name } }) {
+        // console.log(e);
+        html = addButton(html);
+        const marker = L.marker(center, { draggable: true })
+          .addTo(layerGroup)
+          .bindPopup(html);
+        map.flyTo(center, 15);
+
+        const location = {
+          id: marker._leaflet_id,
+          lat: center.lat,
+          lng: center.lng,
+          name,
+        };
+
+        if (place.coords.find(c => c.id === location.id) === undefined)
+          place.coords.push(location);
+
+        marker.on('popupopen', () => openMarker(marker, location.id));
+        marker.on('dragend', () =>
+          draggedMarker(marker, location.id, lineLayer)
+        );
+      })
+      .addTo(map);
 
     function drawLine() {
       const [start, end, ...rest] = place.coords;
@@ -86,7 +111,7 @@ export const MapHook = {
       draggedPlace.lng = newLatLng.lng;
       drawLine();
       discover(marker, newLatLng, id);
-      marker.on('popupopen', () => console.log(openMarker(marker, id)));
+      marker.on('popupopen', () => openMarker(marker, id));
       marker.on('dragend', () => draggedMarker(marker, id, lineLayer));
     }
 
@@ -94,10 +119,10 @@ export const MapHook = {
       // return new Promise((resolve, _) => {
       // resolve(
       geoCoder.reverse(location, 12, result => {
-        let { html } = result[0];
+        let { html, name } = result[0];
         place.coords = place.coords.filter(c => c.id !== id);
         place.coords.push({
-          html,
+          name,
           lat: location.lat,
           lng: location.lng,
           id,
@@ -112,18 +137,17 @@ export const MapHook = {
 
     map.on('click', e => {
       geoCoder.reverse(e.latlng, 12, result => {
-        let { html } = result[0];
+        let { html, name } = result[0];
         html = addButton(html);
 
         const marker = L.marker(e.latlng, { draggable: true });
-        marker.addTo(layerGroup).addTo(map);
-        marker.bindPopup(html);
+        marker.addTo(layerGroup).addTo(map).bindPopup(html);
 
         const location = {
           id: marker._leaflet_id,
           lat: e.latlng.lat,
           lng: e.latlng.lng,
-          html,
+          name,
         };
 
         if (place.coords.find(c => c.id === location.id) === undefined)
