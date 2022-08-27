@@ -38,32 +38,30 @@ export const MapHook = {
 
     const geoCoder = L.Control.Geocoder.nominatim();
 
-    L.Control.geocoder({
+    const coder = L.Control.geocoder({
       defaultMarkGeocode: false,
-    })
-      .on('markgeocode', function ({ geocode: { center, html, name } }) {
-        html = addButton(html);
-        const marker = L.marker(center, { draggable: true })
-          .addTo(layerGroup)
-          .bindPopup(html);
-        map.flyTo(center, 17);
+    }).addTo(map);
 
-        const location = {
-          id: marker._leaflet_id,
-          lat: center.lat,
-          lng: center.lng,
-          name,
-        };
+    coder.on('markgeocode', function ({ geocode: { center, html, name } }) {
+      html = addButton(html);
+      const marker = L.marker(center, { draggable: true })
+        .addTo(layerGroup)
+        .bindPopup(html);
+      map.flyTo(center, 17);
 
-        if (place.coords.find(c => c.id === location.id) === undefined)
-          place.coords.push(place);
+      const location = {
+        id: marker._leaflet_id,
+        lat: center.lat,
+        lng: center.lng,
+        name,
+      };
 
-        marker.on('popupopen', () => openMarker(marker, location.id));
-        marker.on('dragend', () =>
-          draggedMarker(marker, location.id, lineLayer)
-        );
-      })
-      .addTo(map);
+      if (place.coords.find(c => c.id === location.id) === undefined)
+        place.coords.push(location);
+
+      marker.on('popupopen', () => openMarker(marker, location.id));
+      marker.on('dragend', () => draggedMarker(marker, location.id, lineLayer));
+    });
 
     map.invalidateSize({ debounceMoveend: true }).on('moveend', function () {
       console.log(map.getBounds());

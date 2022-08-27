@@ -64,7 +64,6 @@ defmodule LiveviewCountersWeb.HomeLive do
 
   @impl true
   def handle_event("add_point", %{"place" => place}, socket) do
-    IO.puts("add_point")
     {:noreply, socket |> assign(:place, place)}
   end
 
