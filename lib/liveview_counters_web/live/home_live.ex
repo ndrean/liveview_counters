@@ -20,7 +20,8 @@ defmodule LiveviewCountersWeb.HomeLive do
        count6: 0,
        clicks: %{b1: 0, b2: 0, b3: 0, b4: 0, b5: 0, b6: 0, b7: 0},
        data: nil,
-       display_data: nil
+       display_data: nil,
+       place: nil
      )}
   end
 
@@ -28,31 +29,43 @@ defmodule LiveviewCountersWeb.HomeLive do
   @spec render(any) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
+    <MyMap.display />
+    <Table.display place={@place}/>
+
+    <button id="marker" phx-click="push_marker" phx-value-lat={"47.2"} phx-value-lng={"-1.6"}>Marker</button>
     <button id="b1"  phx-click="inc1" phx-value-inc1={1}>Increment: +1</button>
-
     <SimpleCounter.display inc2={10} />
-
     <.live_component module={LiveButton} id="b3" inc3={100} int={0}/>
-
     <HookButton.display inc4={1000}/>
-
-    <ReactButtons.display inc5={10_000} inc6={100_000}/>
-
     <HoverComp.display inc7={1_000_000}/>
-
     <h1>Counter: <%= @count %></h1>
     <h3><%# Jason.encode!(@clicks) %></h3>
     <h3><%# if @display_data != nil, do: Jason.encode!(elem(@display_data,1)) %></h3>
-
-    <hr/>
-    <MyMap.display />
     """
   end
+
+  # <ReactButtons.display inc5={10_000} inc6={100_000}/>
+  # <div id="olmap" style="width: 100%, height: 400px" phx-hook="OlMap"></div>
+  # <div id="popup" class="ol-popup">
+  #   <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+  #   <div id="popup-content"></div>
+  # </div>
 
   defp update_socket(socket, key, inc) do
     socket
     |> update(:count, &(&1 + inc))
     |> update(:clicks, &Map.put(&1, key, &1[key] + 1))
+  end
+
+  def handle_event("push_marker", %{"lat" => lat, "lng" => lng}, socket) do
+    coords = [lat, lng]
+    {:noreply, push_event(socket, "add", %{"coords" => coords})}
+  end
+
+  @impl true
+  def handle_event("add_point", %{"place" => place}, socket) do
+    IO.puts("add_point")
+    {:noreply, socket |> assign(:place, place)}
   end
 
   @impl true
@@ -104,21 +117,18 @@ defmodule LiveviewCountersWeb.HomeLive do
   @impl true
   def handle_event("inc2", %{"inc2" => inc2}, socket) do
     socket = update_socket(socket, :b2, String.to_integer(inc2))
-
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("inc4", %{"inc4" => inc4}, socket) do
     socket = update_socket(socket, :b4, inc4)
-
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("inc5", %{"inc5" => inc5}, socket) do
     socket = update_socket(socket, :b5, inc5)
-
     {:noreply, socket}
   end
 

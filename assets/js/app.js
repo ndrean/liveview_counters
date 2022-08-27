@@ -28,16 +28,17 @@ import './user_socket.js';
 
 import topbar from '../vendor/topbar';
 import { ButtonHook } from './hookButton';
-import { ReactHook } from './hookReact';
+// import { ReactHook } from './hookReact';
 import { Hover } from './hover';
 import { MapHook } from './MapHook';
+// import { OlMap } from './olmap';
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute('content');
 let liveSocket = new LiveSocket('/live', Socket, {
   params: { _csrf_token: csrfToken },
-  hooks: { ButtonHook, Hover, MapHook, ReactHook },
+  hooks: { ButtonHook, Hover, MapHook },
 });
 
 // ReactHook,

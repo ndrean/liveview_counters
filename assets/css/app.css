@@ -5,6 +5,13 @@
 /* @import 'leaflet-geosearch/dist/geosearch.css'; */
 /* @import 'esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css'; */
 
+@import 'ol/ol.css';
+
+#olmap {
+  height: 400px;
+  width: 100%;
+}
+
 #map {
   height: 400px;
   width: 100%;
