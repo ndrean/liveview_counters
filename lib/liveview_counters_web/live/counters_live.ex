@@ -1,14 +1,11 @@
-defmodule LiveviewCountersWeb.HomeLive do
+defmodule LiveviewCountersWeb.CountersLive do
+  # use LiveviewCountersWeb, :live_view
   use Phoenix.LiveView
-  # alias Phoenix.LiveView.JS
   require WaitForIt
   require Logger
 
-  # @topic "counters"
-  # @topic inspect(__MODULE__)
-
   @impl true
-  def mount(_, _, socket) do
+  def mount(_p, _s, socket) do
     if connected?(socket), do: Logger.debug(socket, label: "parent")
     # Phoenix.PubSub.subscribe(LiveviewCountersWeb.PubSub, @topic)
     # LiveviewCountersWeb.Endpoint.subscribe(@topic)
@@ -26,45 +23,24 @@ defmodule LiveviewCountersWeb.HomeLive do
   end
 
   @impl true
-  @spec render(any) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
-    <MyMap.display />
-    <Table.display place={@place}/>
-
-    <button id="marker" phx-click="push_marker" phx-value-lat={"47.2"} phx-value-lng={"-1.6"}>Marker</button>
     <button id="b1"  phx-click="inc1" phx-value-inc1={1}>Increment: +1</button>
     <SimpleCounter.display inc2={10} />
     <.live_component module={LiveButton} id="b3" inc3={100} int={0}/>
     <HookButton.display inc4={1000}/>
+    <ReactButtons.display inc5={10_000} inc6={100_000} />
     <HoverComp.display inc7={1_000_000}/>
     <h1>Counter: <%= @count %></h1>
-    <h3><%# Jason.encode!(@clicks) %></h3>
-    <h3><%# if @display_data != nil, do: Jason.encode!(elem(@display_data,1)) %></h3>
+    <h3><%= Jason.encode!(@clicks) %></h3>
+    <h3><%= if @display_data != nil, do: Jason.encode!(elem(@display_data,1)) %></h3>
     """
   end
-
-  # <ReactButtons.display inc5={10_000} inc6={100_000}/>
-  # <div id="olmap" style="width: 100%, height: 400px" phx-hook="OlMap"></div>
-  # <div id="popup" class="ol-popup">
-  #   <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-  #   <div id="popup-content"></div>
-  # </div>
 
   defp update_socket(socket, key, inc) do
     socket
     |> update(:count, &(&1 + inc))
     |> update(:clicks, &Map.put(&1, key, &1[key] + 1))
-  end
-
-  def handle_event("push_marker", %{"lat" => lat, "lng" => lng}, socket) do
-    coords = [lat, lng]
-    {:noreply, push_event(socket, "add", %{"coords" => coords})}
-  end
-
-  @impl true
-  def handle_event("add_point", %{"place" => place}, socket) do
-    {:noreply, socket |> assign(:place, place)}
   end
 
   @impl true

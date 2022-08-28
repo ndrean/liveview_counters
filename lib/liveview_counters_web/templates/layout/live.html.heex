@@ -7,5 +7,12 @@
     phx-click="lv:clear-flash"
     phx-value-key="error"><%= live_flash(@flash, :error) %></p>
 
+<nav>
+   <h3>NavBar Test</h3>
+   <ul>
+      <li><%# live_patch "Counters", to: Routes.counters_path(socket, :index)%></li>
+      <li><%# live_patch "Map", to: Routes.map_path(socket, :index)%></li>
+    </ul>
+</nav>
   <%= @inner_content %>
 </main>

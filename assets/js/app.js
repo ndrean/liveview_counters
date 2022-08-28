@@ -28,7 +28,7 @@ import './user_socket.js';
 
 import topbar from '../vendor/topbar';
 import { ButtonHook } from './hookButton';
-// import { ReactHook } from './hookReact';
+import { ReactHook } from './hookReact';
 import { Hover } from './hover';
 import { MapHook } from './MapHook';
 // import { OlMap } from './olmap';
@@ -38,7 +38,7 @@ let csrfToken = document
   .getAttribute('content');
 let liveSocket = new LiveSocket('/live', Socket, {
   params: { _csrf_token: csrfToken },
-  hooks: { ButtonHook, Hover, MapHook },
+  hooks: { ButtonHook, Hover, MapHook, ReactHook },
 });
 
 // ReactHook,
@@ -56,3 +56,14 @@ liveSocket.connect();
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket;
+
+const online = document.getElementById('online');
+const offline = document.getElementById('offline');
+window.addEventListener('offline', () => {
+  online.style.display = 'none';
+  offline.style.display = '';
+});
+window.addEventListener('online', () => {
+  online.style.display = '';
+  offline.style.display = 'none';
+});
