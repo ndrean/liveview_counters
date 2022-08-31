@@ -23,3 +23,21 @@ Icons: <https://ionic.io/ionicons>,
 attribute :id, :uuid do
 primary_key? true
 default &Ecto.UUID.generate/0
+
+<button id="test" phx-click={JS.dispatch("push-test", detail: %{"hooks" => "MapHook_map-ButtonHook_click", nodes => node1_evt1-node2_evt2})}>Push</button>
+
+window.addEventListener('push-test', ({ detail: { hooks, nodes } }) => {
+  hooks
+  .split('-')
+  .map(e => e.split('_'))
+  .forEach(([hook, fun]) => {
+    eval(`${hook}.${fun}()`);
+  });
+
+  nodes
+  .parse
+  .forEach(([node, evt])=>{
+    document
+    .getElementById(node)
+    .dispatchEvent(new Event(evt))
+});

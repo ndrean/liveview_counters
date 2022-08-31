@@ -15,6 +15,8 @@ L.Marker.prototype.options.icon = DefaultIcon;
 function getLocation(map) {
   navigator.geolocation.getCurrentPosition(locationfound, locationdenied);
   function locationfound({ coords: { latitude: lat, longitude: lng } }) {
+    place.current = L.latLng(lat, lng);
+    console.log(place);
     map.flyTo([lat, lng], 12);
   }
   function locationdenied() {
@@ -22,11 +24,11 @@ function getLocation(map) {
   }
 }
 
-const place = proxy({ coords: [], distance: 0 });
+const place = proxy({ coords: [], distance: 0, current: [] });
 
 export const MapHook = {
   mounted() {
-    const map = L.map('map').setView([45, 0], 10);
+    const map = L.map('map').setView([47, -1.5], 10);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 20,
       attribution: '© OpenStreetMap',
@@ -73,11 +75,9 @@ export const MapHook = {
 
     function drawLine() {
       const [start, end, ...rest] = place.coords;
-      if (!start || !end) lineLayer.clearLayers();
       if (start && end) {
         const p1 = L.latLng([start.lat, start.lng]);
         const p2 = L.latLng([end.lat, end.lng]);
-        console.log('draw: ', { p1, p2 });
         L.polyline(
           [
             [start.lat, start.lng],
@@ -108,14 +108,12 @@ export const MapHook = {
     }
 
     function draggedMarker(mark, id, lineLayer) {
-      document.querySelector('.leaflet-interactive').remove();
       layerGroup.removeLayer(mark);
       const newLatLng = mark.getLatLng();
       const marker = L.marker(newLatLng, { draggable: true });
       marker.addTo(layerGroup);
       const index = place.coords.findIndex(c => c.id === id);
       discover(marker, newLatLng, index, id);
-
       marker.on('popupopen', () => openMarker(marker, id));
       marker.on('dragend', () => draggedMarker(marker, id, lineLayer));
     }
@@ -129,7 +127,11 @@ export const MapHook = {
           lat: newLatLng.lat.toFixed(4),
           lng: newLatLng.lng.toFixed(4),
         };
-        if (place.coords.length == 2) drawLine();
+
+        if (index <= 1) {
+          lineLayer.clearLayers();
+          drawLine();
+        }
         html = addButton(html);
         return marker.bindPopup(html);
       });
@@ -150,7 +152,7 @@ export const MapHook = {
 
         if (place.coords.find(c => c.id === location.id) === undefined) {
           place.coords.push(location);
-          drawLine(lineLayer);
+          drawLine();
         }
         marker.on('popupopen', () => openMarker(marker, location.id));
         marker.on('dragend', () =>

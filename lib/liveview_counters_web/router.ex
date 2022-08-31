@@ -17,8 +17,9 @@ defmodule LiveviewCountersWeb.Router do
   scope "/", LiveviewCountersWeb do
     pipe_through(:browser)
 
-    get("/", PageController, :index)
-    live("/home", HomeLive)
+    # live("/", PageLive, :index)
+    live("/map", MapLive, :index)
+    live("/", CountersLive, :index)
   end
 
   # Other scopes may use custom stacks.

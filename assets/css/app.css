@@ -5,7 +5,7 @@
 /* @import 'leaflet-geosearch/dist/geosearch.css'; */
 /* @import 'esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css'; */
 
-@import 'ol/ol.css';
+/* @import 'ol/ol.css'; */
 
 #olmap {
   height: 400px;
@@ -15,6 +15,32 @@
 #map {
   height: 400px;
   width: 100%;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: #cfd8dc;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+}
+
+nav li {
+  padding-left: 1rem;
+}
+
+nav a {
+  text-decoration: none;
+  color: lightblue
+}
+
+.active {
+  background: red;
 }
 
 /* .leaflet-container {
